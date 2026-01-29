@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Travel Diary Analyzer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* CSS Variables - Define colors and styling values */
+    :root {
+      --ink: #1a1a1a;
+      --paper: #ffffff;
+      --accent: #ff6b35;
+      --accent-light: #ff8c5a;
+      --zen: #2d8659;
+      --adventure: #d97706;
+      --border: #e5e7eb;
+      --muted: #6b7280;
+      --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%);
+    }
+    
+    /* Reset - Remove default margins/padding from all elements */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    /* Body - Main page styling */
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-gradient);
+      background-attachment: fixed;
+      background-size: cover;
+      color: var(--ink);
+      line-height: 1.6;
+      padding: 1rem;
+      min-height: 100vh;
+    }
+    
+    /* Main Container - Center content */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+    }
+    
+    /* Headings */
+    h1 { 
+      font-size: 2rem; 
+      color: var(--accent); 
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+    .subtitle { 
+      font-size: 1rem; 
+      color: var(--muted); 
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    h2 { 
+      font-size: 1.4rem; 
+      margin-top: 2rem; 
+      margin-bottom: 1rem; 
+      color: var(--zen);
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 0.5rem;
+    }
+    
+    /* Form Elements */
+    label { 
+      display: block; 
+      font-size: 0.9rem; 
+      color: var(--muted); 
+      margin-bottom: 0.4rem;
+      font-weight: 500;
+    }
+    input, textarea, select {
+      font-family: inherit;
+      padding: 0.6rem 0.8rem;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      width: 100%;
+      font-size: 0.95rem;
+      transition: border-color 0.3s;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+    textarea { min-height: 80px; resize: vertical; }
+    
+    /* Buttons */
+    button {
+      font-family: inherit;
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.7rem 1.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 0.95rem;
+      transition: all 0.3s;
+    }
+    button:hover { 
+      background: #e55a2b;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255,107,53,0.3);
+    }
+    button.secondary { 
+      background: var(--zen); 
+    }
+    button.secondary:hover { 
+      background: #256e4a;
+    }
+    
+    /* Grid Layout - 2 columns */
+    .grid2 { 
+      display: grid; 
+      grid-template-columns: 1fr 1fr; 
+      gap: 1rem; 
+    }
+    @media (max-width: 640px) { 
+      .grid2 { grid-template-columns: 1fr; } 
+      .container { padding: 1rem; }
+    }
+    
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td { 
+      padding: 0.7rem; 
+      text-align: left; 
+      border-bottom: 1px solid var(--border); 
+    }
+    th { 
+      background: var(--zen); 
+      color: white; 
+      font-weight: 600;
+    }
+    tr:nth-child(even) { 
+      background: rgba(45,134,89,0.05); 
+    }
+    tr:hover {
+      background: rgba(255,107,53,0.08);
+    }
+    
+    /* KPI Cards */
+    .kpi-card {
+      background: white;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 1.2rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .kpi-card .value { 
+      font-size: 1.8rem; 
+      font-weight: 600; 
+      color: var(--accent); 
+      margin: 0.5rem 0;
+    }
+    .kpi-card .label { 
+      font-size: 0.85rem; 
+      color: var(--muted); 
+      font-weight: 500;
+    }
+    
+    /* Outlier Highlighting */
+    .outlier { 
+      background: #fff4e6 !important; 
+      border-left: 4px solid var(--accent) !important; 
+    }
+    
+    /* Narrative Text */
+    .narrative { 
+      font-size: 1rem; 
+      color: var(--ink); 
+      margin: 1rem 0; 
+      padding: 1.2rem; 
+      background: rgba(255,107,53,0.08); 
+      border-radius: 10px;
+      border-left: 4px solid var(--accent);
+      line-height: 1.8;
+    }
+    
+    /* Badges */
+    .badge { 
+      display: inline-block; 
+      padding: 0.3rem 0.7rem; 
+      border-radius: 6px; 
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+    .badge-adventure { 
+      background: #fef3c7; 
+      color: var(--adventure); 
+    }
+    .badge-zen { 
+      background: #d1fae5; 
+      color: var(--zen); 
+    }
+    
+    /* Utility Classes */
+    .hidden { display: none !important; }
+    .ledger-wrap { overflow-x: auto; margin: 1rem 0; }
+    .info-box {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      padding: 1rem;
+      border-radius: 6px;
+      margin: 1rem 0;
+      font-size: 0.9rem;
+    }
+    
+    /* Entry Row Styling */
+    .entry-row {
+      display: grid;
+      grid-template-columns: 60px 1.5fr 80px 100px 90px 80px 1.5fr 100px 80px;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+      align-items: center;
+    }
+    .entry-row input, .entry-row select {
+      margin-bottom: 0;
+      font-size: 0.85rem;
+      padding: 0.4rem 0.5rem;
+    }
+    .entry-row button {
+      padding: 0.4rem 0.6rem;
+      font-size: 0.8rem;
+      background: #dc2626;
+    }
+    .entry-row button:hover {
+      background: #b91c1c;
+    }
+    
+    @media (max-width: 768px) {
+      .entry-row {
+        grid-template-columns: 1fr;
+        gap: 0.3rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📊 Travel Diary Analyzer</h1>
+      <p class="subtitle">Analyze your trip data and create a comprehensive travel report</p>
+    </header>
+
+    <section id="input-section">
+      <h2>Trip Overview</h2>
+      
+      <div class="grid2">
+        <div>
+          <label>Duration (days)</label>
+          <input type="number" id="duration" value="5" min="1" />
+        </div>
+        <div>
+          <label>Destination</label>
+          <input type="text" id="destination" value="Goa, India" placeholder="e.g. Goa, India" />
+        </div>
+        <div>
+          <label>Travel Type</label>
+          <input type="text" id="travelType" value="Family Trip" placeholder="e.g. Solo, Family, Friends" />
+        </div>
+        <div>
+          <label>Total Budget (₹)</label>
+          <input type="number" id="totalBudget" value="50000" min="0" step="100" />
+        </div>
+      </div>
+      
+      <div>
+        <label>Key Activities (one per line)</label>
+        <textarea id="keyActivities" rows="3">Beach visit
+Local food
+Temple visit
+Shopping</textarea>
+      </div>
+
+      <h2>Daily Log</h2>
+      <div class="info-box">
+        <strong>How to fill:</strong> For each activity, enter Day, Activity name, Time (hours), Steps, Cost (₹), Mood (1-10), and a special memory (X-Factor). Choose Type: Adventure (more active) or Zen (relaxed).
+      </div>
+      
+      <div class="entry-row" style="font-size:0.75rem;color:var(--muted);font-weight:600;margin-bottom:0.5rem;padding:0.5rem;background:#f3f4f6;border-radius:6px;">
+        <span>Day</span>
+        <span>Activity</span>
+        <span>Time(h)</span>
+        <span>Steps</span>
+        <span>Cost(₹)</span>
+        <span>Mood</span>
+        <span>X-Factor</span>
+        <span>Type</span>
+        <span></span>
+      </div>
+      <div id="entries"></div>
+      <button type="button" id="addEntry">+ Add New Activity</button>
+
+      <div style="margin-top:1.5rem;">
+        <label>Stranger Interactions (total conversations)</label>
+        <input type="number" id="strangerIndex" value="12" min="0" placeholder="e.g. 12" />
+      </div>
+      <div>
+        <label>Tea/Snacks Frequency (total count)</label>
+        <input type="number" id="caffeineSnackFreq" value="15" min="0" placeholder="e.g. 15" />
+      </div>
+
+      <p style="margin-top: 1.5rem; text-align: center;">
+        <button type="button" id="generate">📈 Generate Report</button>
+        <button type="button" id="loadSample" class="secondary" style="margin-left:0.5rem;" onclick="loadSampleData(); return false;">📋 Load Sample Data</button>
+      </p>
+    </section>
+
+    <div id="output" class="hidden">
+      <h2>Grand Ledger</h2>
+      <div class="ledger-wrap">
+        <table id="ledgerTable">
+          <thead>
+            <tr>
+              <th>Day</th>
+              <th>Activity</th>
+              <th>Time (h)</th>
+              <th>Steps</th>
+              <th>Cost (₹)</th>
+              <th>Mood</th>
+              <th>X-Factor</th>
+              <th>Type</th>
+            </tr>
+          </thead>
+          <tbody id="ledgerBody"></tbody>
+        </table>
+      </div>
+
+      <h2>Efficiency & Economy</h2>
+      <div id="efficiencySection"></div>
+
+      <h2>Sentiment Map</h2>
+      <div id="sentimentSection"></div>
+
+      <h2>KPI Dashboard</h2>
+      <div id="kpiSection" class="grid2"></div>
+
+      <h2>Statistical Outliers</h2>
+      <p style="font-size:0.9rem;color:var(--muted);">Moments where mood was unexpectedly high despite low physical energy or high cost.</p>
+      <div id="outliersSection"></div>
+
+      <h2>Narrative Synthesis</h2>
+      <div id="narrativeSection"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    /* ============================================
+       SAMPLE DATA - Default entries shown when app loads
+       ============================================ */
+    var defaultEntries = [
+      { day: 1, activity: 'Beach Visit', time: 4, steps: 8500, cost: 500, mood: 9, xfactor: 'Perfect sunset', type: 'Zen' },
+      { day: 2, activity: 'Local Food Tour', time: 3.5, steps: 12000, cost: 1200, mood: 10, xfactor: 'Best vada pav found', type: 'Adventure' },
+      { day: 2, activity: 'Temple Visit', time: 2, steps: 3000, cost: 200, mood: 8, xfactor: 'Peaceful atmosphere', type: 'Zen' },
+      { day: 3, activity: 'Shopping', time: 3, steps: 6000, cost: 3500, mood: 7, xfactor: 'Local handicrafts bought', type: 'Adventure' },
+      { day: 4, activity: 'Water Sports', time: 2.5, steps: 2000, cost: 2500, mood: 9, xfactor: 'Jet ski fun', type: 'Adventure' },
+      { day: 5, activity: 'Relaxation', time: 2, steps: 1500, cost: 800, mood: 8, xfactor: 'Beachside chai', type: 'Zen' },
+    ];
+
+    // Current entries array - stores user's entries
+    var entries = JSON.parse(JSON.stringify(defaultEntries));
+
+    /* ============================================
+       HELPER FUNCTIONS
+       ============================================ */
+    
+    // Format day number to 2 digits (01, 02, etc.)
+    function padTwo(n) {
+      return (n < 10 ? '0' : '') + n;
+    }
+
+    // Return emoji based on mood score
+    function moodEmoji(m) {
+      if (m >= 9) return '😄';
+      if (m >= 7) return '🙂';
+      if (m >= 5) return '😐';
+      if (m >= 3) return '😕';
+      return '😢';
+    }
+
+    // Escape text for use in HTML attribute (prevents quotes breaking the HTML)
+    function escapeAttr(s) {
+      if (s === null || s === undefined) return '';
+      s = String(s);
+      return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    /* ============================================
+       RENDER ENTRIES - Display entries in the form
+       ============================================ */
+    function renderEntries() {
+      var container = document.getElementById('entries');
+      if (!container) return;
+      container.innerHTML = ''; // Clear all entries first
+      
+      // Create a row for each entry
+      for (var i = 0; i < entries.length; i++) {
+        var e = entries[i];
+        var row = document.createElement('div');
+        row.className = 'entry-row';
+        
+        // Create HTML for input fields (escape text so quotes don't break HTML)
+        row.innerHTML = 
+          '<input type="number" data-i="' + i + '" data-f="day" value="' + e.day + '" placeholder="Day" min="1" />' +
+          '<input type="text" data-i="' + i + '" data-f="activity" value="' + escapeAttr(e.activity) + '" placeholder="Activity" />' +
+          '<input type="number" data-i="' + i + '" data-f="time" value="' + e.time + '" placeholder="Hours" min="0" step="0.5" />' +
+          '<input type="number" data-i="' + i + '" data-f="steps" value="' + e.steps + '" placeholder="Steps" min="0" />' +
+          '<input type="number" data-i="' + i + '" data-f="cost" value="' + e.cost + '" placeholder="₹" min="0" step="10" />' +
+          '<input type="number" data-i="' + i + '" data-f="mood" value="' + e.mood + '" placeholder="1-10" min="1" max="10" />' +
+          '<input type="text" data-i="' + i + '" data-f="xfactor" value="' + escapeAttr(e.xfactor) + '" placeholder="Memory" />' +
+          '<select data-i="' + i + '" data-f="type">' +
+            '<option value="Adventure"' + (e.type === 'Adventure' ? ' selected' : '') + '>Adventure</option>' +
+            '<option value="Zen"' + (e.type === 'Zen' ? ' selected' : '') + '>Zen</option>' +
+          '</select>' +
+          '<button type="button" class="removeEntry" data-i="' + i + '">Remove</button>';
+        
+        container.appendChild(row);
+      }
+      
+      // Event listeners - Update entries array when user changes input
+      var allInputs = container.querySelectorAll('input, select');
+      for (var j = 0; j < allInputs.length; j++) {
+        allInputs[j].addEventListener('change', function() {
+          var idx = parseInt(this.getAttribute('data-i'));
+          var field = this.getAttribute('data-f');
+          var val = this.type === 'number' ? parseFloat(this.value) || 0 : this.value;
+          
+          if (field === 'day' || field === 'steps' || field === 'mood') {
+            entries[idx][field] = parseInt(val) || 0;
+          } else {
+            entries[idx][field] = val;
+          }
+        });
+      }
+      
+      // Event listeners for remove buttons
+      var removeBtns = container.querySelectorAll('.removeEntry');
+      for (var k = 0; k < removeBtns.length; k++) {
+        removeBtns[k].addEventListener('click', function() {
+          var idx = parseInt(this.getAttribute('data-i'));
+          entries.splice(idx, 1); // Remove entry from array
+          renderEntries(); // Re-render
+        });
+      }
+    }
+
+    /* ============================================
+       ADD ENTRY BUTTON - Add new entry
+       ============================================ */
+    document.getElementById('addEntry').addEventListener('click', function() {
+      var last = entries[entries.length - 1];
+      entries.push({
+        day: last ? last.day : 1,
+        activity: '',
+        time: 0,
+        steps: 0,
+        cost: 0,
+        mood: 5,
+        xfactor: '',
+        type: 'Adventure',
+      });
+      renderEntries();
+    });
+
+    /* ============================================
+       LOAD SAMPLE DATA - Load sample data
+       ============================================ */
+    function loadSampleData() {
+      // Reset entries to a fresh copy of default
+      entries = [];
+      for (var s = 0; s < defaultEntries.length; s++) {
+        entries.push({
+          day: defaultEntries[s].day,
+          activity: defaultEntries[s].activity,
+          time: defaultEntries[s].time,
+          steps: defaultEntries[s].steps,
+          cost: defaultEntries[s].cost,
+          mood: defaultEntries[s].mood,
+          xfactor: defaultEntries[s].xfactor,
+          type: defaultEntries[s].type
+        });
+      }
+      
+      // Reset trip overview fields
+      var dur = document.getElementById('duration');
+      var dest = document.getElementById('destination');
+      var ttype = document.getElementById('travelType');
+      var budget = document.getElementById('totalBudget');
+      var stranger = document.getElementById('strangerIndex');
+      var snack = document.getElementById('caffeineSnackFreq');
+      var keyAct = document.getElementById('keyActivities');
+      if (dur) dur.value = 5;
+      if (dest) dest.value = 'Goa, India';
+      if (ttype) ttype.value = 'Family Trip';
+      if (budget) budget.value = 50000;
+      if (stranger) stranger.value = 12;
+      if (snack) snack.value = 15;
+      if (keyAct) keyAct.value = 'Beach visit\nLocal food\nTemple visit\nShopping';
+      
+      // Re-render entries (force DOM update)
+      renderEntries();
+    }
+
+    var loadSampleBtn = document.getElementById('loadSample');
+    if (loadSampleBtn) {
+      loadSampleBtn.addEventListener('click', loadSampleData);
+    }
+
+    /* ============================================
+       GET ENTRIES FROM FORM - Read data from form
+       ============================================ */
+    function getEntriesFromForm() {
+      var rows = document.querySelectorAll('#entries .entry-row');
+      var out = [];
+      
+      for (var r = 0; r < rows.length; r++) {
+        var row = rows[r];
+        var dayEl = row.querySelector('[data-f="day"]');
+        var day = dayEl ? parseInt(dayEl.value, 10) : 1;
+        if (isNaN(day)) day = 1;
+        
+        var actEl = row.querySelector('[data-f="activity"]');
+        var activity = actEl ? actEl.value : '';
+        
+        var timeEl = row.querySelector('[data-f="time"]');
+        var time = timeEl ? parseFloat(timeEl.value) : 0;
+        if (isNaN(time)) time = 0;
+        
+        var stepsEl = row.querySelector('[data-f="steps"]');
+        var steps = stepsEl ? parseInt(stepsEl.value, 10) : 0;
+        if (isNaN(steps)) steps = 0;
+        
+        var costEl = row.querySelector('[data-f="cost"]');
+        var cost = costEl ? parseFloat(costEl.value) : 0;
+        if (isNaN(cost)) cost = 0;
+        
+        var moodEl = row.querySelector('[data-f="mood"]');
+        var mood = moodEl ? parseInt(moodEl.value, 10) : 5;
+        if (isNaN(mood)) mood = 5;
+        
+        var xfEl = row.querySelector('[data-f="xfactor"]');
+        var xfactor = xfEl ? xfEl.value : '';
+        
+        var typeEl = row.querySelector('[data-f="type"]');
+        var type = typeEl ? typeEl.value : 'Adventure';
+        
+        out.push({ day: day, activity: activity, time: time, steps: steps, cost: cost, mood: mood, xfactor: xfactor, type: type });
+      }
+      
+      // If no rows found, return current entries array
+      return out.length > 0 ? out : entries;
+    }
+
+    /* ============================================
+       GENERATE REPORT - Main function that creates report
+       ============================================ */
+    function generate() {
+      // Read values from form
+      var duration = parseInt(document.getElementById('duration').value) || 5;
+      var destination = document.getElementById('destination').value || 'Trip';
+      var travelType = document.getElementById('travelType').value || 'Travel';
+      var totalBudget = parseFloat(document.getElementById('totalBudget').value) || 50000;
+      var strangerIndex = parseInt(document.getElementById('strangerIndex').value) || 0;
+      var caffeineSnackFreq = parseInt(document.getElementById('caffeineSnackFreq').value) || 0;
+
+      var data = getEntriesFromForm();
+      
+      // Calculations - Calculate totals and averages
+      var totalCost = 0;
+      var totalSteps = 0;
+      var totalHours = 0;
+      var totalMood = 0;
+      
+      for (var i = 0; i < data.length; i++) {
+        totalCost += data[i].cost;
+        totalSteps += data[i].steps;
+        totalHours += data[i].time;
+        totalMood += data[i].mood;
+      }
+      
+      var avgMood = data.length ? totalMood / data.length : 0;
+      var costPerDay = totalCost / duration;
+      var totalWakeHours = duration * 16; // Assume 16 waking hours per day
+      var timeDensity = totalWakeHours > 0 ? ((totalHours / totalWakeHours) * 100).toFixed(0) : 0;
+
+      // Create Grand Ledger Table
+      var ledgerBody = document.getElementById('ledgerBody');
+      ledgerBody.innerHTML = '';
+      
+      for (var j = 0; j < data.length; j++) {
+        var e = data[j];
+        var tr = document.createElement('tr');
+        tr.innerHTML = 
+          '<td>' + padTwo(e.day) + '</td>' +
+          '<td>' + e.activity + '</td>' +
+          '<td>' + e.time + '</td>' +
+          '<td>' + e.steps.toLocaleString('en-IN') + '</td>' +
+          '<td>₹' + e.cost.toLocaleString('en-IN') + '</td>' +
+          '<td>' + e.mood + '/10 ' + moodEmoji(e.mood) + '</td>' +
+          '<td>' + e.xfactor + '</td>' +
+          '<td><span class="badge badge-' + e.type.toLowerCase() + '">' + e.type + '</span></td>';
+        ledgerBody.appendChild(tr);
+      }
+
+      // Find best mood per rupee - activity with highest mood per rupee
+      var bestMoodPerRupee = { mood: 0, cost: 1, activity: '', ratio: 0 };
+      for (var k = 0; k < data.length; k++) {
+        var ratio = data[k].cost > 0 ? data[k].mood / data[k].cost : data[k].mood;
+        if (ratio > bestMoodPerRupee.ratio) {
+          bestMoodPerRupee = {
+            mood: data[k].mood,
+            cost: data[k].cost,
+            activity: data[k].activity,
+            ratio: ratio
+          };
+        }
+      }
+
+      // Happiness ROI - Mood per ₹100 per day
+      var happinessROI = costPerDay > 0 ? (avgMood / (costPerDay / 100)).toFixed(2) : '—';
+
+      // Efficiency Section
+      document.getElementById('efficiencySection').innerHTML = 
+        '<div class="kpi-card">' +
+          '<span class="label">Total Spent</span>' +
+          '<div class="value">₹' + totalCost.toLocaleString('en-IN') + '</div>' +
+          '<p style="margin:0.5rem 0 0;font-size:0.9rem">Budget: ₹' + totalBudget.toLocaleString('en-IN') + ' (' + ((totalCost/totalBudget)*100).toFixed(0) + '% used)</p>' +
+        '</div>' +
+        '<div class="kpi-card">' +
+          '<span class="label">Happiness ROI (Mood per ₹100/day)</span>' +
+          '<div class="value">' + happinessROI + '</div>' +
+          '<p style="margin:0.5rem 0 0;font-size:0.9rem">Best value: <strong>' + bestMoodPerRupee.activity + '</strong> (mood ' + bestMoodPerRupee.mood + '/10 for ₹' + bestMoodPerRupee.cost + ')</p>' +
+        '</div>' +
+        '<div class="kpi-card">' +
+          '<span class="label">Time Density (% of waking hours)</span>' +
+          '<div class="value">' + timeDensity + '%</div>' +
+          '<p style="margin:0.5rem 0 0;font-size:0.9rem">' + (parseInt(timeDensity) >= 50 ? 'You are an "Active Explorer."' : 'You balanced activity with rest.') + '</p>' +
+        '</div>';
+
+      // Sentiment Map - Peak Adventure and Peak Zen
+      var adventure = [];
+      var zen = [];
+      for (var a = 0; a < data.length; a++) {
+        if (data[a].type === 'Adventure') adventure.push(data[a]);
+        if (data[a].type === 'Zen') zen.push(data[a]);
+      }
+      
+      var peakAdventure = null;
+      if (adventure.length > 0) {
+        peakAdventure = adventure[0];
+        for (var b = 1; b < adventure.length; b++) {
+          if (adventure[b].mood >= peakAdventure.mood) peakAdventure = adventure[b];
+        }
+      }
+      
+      var peakZen = null;
+      if (zen.length > 0) {
+        peakZen = zen[0];
+        for (var c = 1; c < zen.length; c++) {
+          if (zen[c].mood >= peakZen.mood) peakZen = zen[c];
+        }
+      }
+      
+      document.getElementById('sentimentSection').innerHTML = 
+        '<p><span class="badge badge-adventure">Peak Adventure</span> ' + 
+        (peakAdventure ? peakAdventure.activity + ' (Day ' + peakAdventure.day + ') — Mood ' + peakAdventure.mood + '/10. ' + peakAdventure.xfactor : 'No adventure entries.') + '</p>' +
+        '<p><span class="badge badge-zen">Peak Zen</span> ' + 
+        (peakZen ? peakZen.activity + ' (Day ' + peakZen.day + ') — Mood ' + peakZen.mood + '/10. ' + peakZen.xfactor : 'No zen entries.') + '</p>';
+
+      // KPI Dashboard
+      var adventureHours = 0;
+      var zenHours = 0;
+      for (var d = 0; d < data.length; d++) {
+        if (data[d].type === 'Adventure') adventureHours += data[d].time;
+        if (data[d].type === 'Zen') zenHours += data[d].time;
+      }
+      var ratioNum = zenHours > 0 ? (adventureHours / zenHours).toFixed(1) : adventureHours.toFixed(1);
+      var strangerPerDay = duration > 0 ? (strangerIndex / duration).toFixed(1) : '0';
+      var funToBudget = totalBudget > 0 ? (avgMood / (totalCost / totalBudget)).toFixed(2) : '—';
+
+      document.getElementById('kpiSection').innerHTML = 
+        '<div class="kpi-card"><span class="label">Adventure-to-Relaxation Ratio</span><div class="value">' + ratioNum + ':1</div><p style="margin:0.25rem 0 0;font-size:0.85rem">Hours "doing" vs "being."</p></div>' +
+        '<div class="kpi-card"><span class="label">Stranger Interaction Index</span><div class="value">' + strangerPerDay + '</div><p style="margin:0.25rem 0 0;font-size:0.85rem">Conversations per day.</p></div>' +
+        '<div class="kpi-card"><span class="label">Tea/Snack Frequency</span><div class="value">' + caffeineSnackFreq + '</div><p style="margin:0.25rem 0 0;font-size:0.85rem">Over entire trip.</p></div>' +
+        '<div class="kpi-card"><span class="label">Fun-to-Budget Ratio</span><div class="value">' + funToBudget + '</div><p style="margin:0.25rem 0 0;font-size:0.85rem">Avg mood vs cost efficiency.</p></div>';
+
+      // Outliers - High mood with low steps or high cost
+      var avgSteps = data.length ? totalSteps / data.length : 0;
+      var avgCost = data.length ? totalCost / data.length : 0;
+      var outliers = [];
+      
+      for (var o = 0; o < data.length; o++) {
+        var lowEnergyHighMood = data[o].steps < avgSteps * 0.6 && data[o].mood >= 8;
+        var highCostHighMood = data[o].cost > avgCost * 2 && data[o].mood >= 8;
+        if (lowEnergyHighMood || highCostHighMood) {
+          outliers.push(data[o]);
+        }
+      }
+
+      // Highlight outliers in table
+      var ledgerRows = ledgerBody.querySelectorAll('tr');
+      for (var p = 0; p < data.length; p++) {
+        var isOutlier = false;
+        for (var q = 0; q < outliers.length; q++) {
+          if (outliers[q] === data[p]) {
+            isOutlier = true;
+            break;
+          }
+        }
+        if (isOutlier) ledgerRows[p].classList.add('outlier');
+      }
+
+      // Outliers section
+      var outlierHtml = '';
+      if (outliers.length > 0) {
+        outlierHtml = '<ul style="margin:0;padding-left:1.5rem;">';
+        for (var r = 0; r < outliers.length; r++) {
+          var e = outliers[r];
+          var desc = '';
+          if (e.steps < avgSteps * 0.6) desc += 'Low steps (' + e.steps + ') but high mood. ';
+          if (e.cost > avgCost * 2) desc += 'High cost (₹' + e.cost + ') yet strong satisfaction.';
+          outlierHtml += '<li style="margin:0.5rem 0;"><strong>' + e.activity + '</strong> (Day ' + e.day + '): Mood ' + e.mood + '/10 — ' + desc + ' X-Factor: "' + e.xfactor + '"</li>';
+        }
+        outlierHtml += '</ul>';
+      } else {
+        outlierHtml = '<p style="color:var(--muted);">No strong outliers; mood aligned with energy and cost.</p>';
+      }
+      document.getElementById('outliersSection').innerHTML = outlierHtml;
+
+      // Narrative Synthesis
+      var activePct = totalWakeHours > 0 ? Math.round((totalHours / totalWakeHours) * 100) : 0;
+      var narrative = 
+        '<p class="narrative">Your ' + duration + '-day ' + travelType + ' to ' + destination + ' spent ₹' + totalCost.toLocaleString('en-IN') + ' of a ₹' + totalBudget.toLocaleString('en-IN') + ' budget, with ' + data.length + ' logged activities and ' + totalSteps.toLocaleString('en-IN') + ' steps. The numbers paint you as ' + (activePct >= 50 ? 'an active explorer' : 'someone who values rhythm over rush') + ': ' + timeDensity + '% of waking hours were spent in structured activity, and your Adventure-to-Relaxation ratio of ' + ratioNum + ':1 shows ' + (parseFloat(ratioNum) >= 2 ? 'a bias toward doing over resting.' : 'a balanced mix of intensity and calm.') + '</p>' +
+        '<p class="narrative">Joy and spending were ' + (parseFloat(happinessROI) > 0.5 ? 'not tightly coupled' : 'moderately linked') + ': your best mood-per-rupee moment was <strong>' + bestMoodPerRupee.activity + '</strong> (' + bestMoodPerRupee.mood + '/10 for ₹' + bestMoodPerRupee.cost + '). ' + (outliers.length > 0 ? 'Outlier moments—high mood with low steps or high cost—highlight ' + outliers.map(function(o) { return o.activity; }).join(', ') + '; the data suggests your happiness often came from experience quality rather than exertion or price.' : 'Mood tended to track energy and cost without big surprises.') + '</p>' +
+        '<p class="narrative">The Stranger Interaction Index (' + strangerPerDay + ' per day) and Tea/Snack count (' + caffeineSnackFreq + ') round out the story: your style blends ' + (peakAdventure ? 'peak adventure (' + peakAdventure.activity + ')' : 'activity') + ' with ' + (peakZen ? 'peak zen (' + peakZen.activity + ')' : 'rest') + '. The narrative of this trip is one of ' + (avgMood >= 7.5 ? 'high satisfaction' : 'varied experience') + '—a data story that fits a ' + travelType + ' in ' + destination + '.</p>';
+      
+      document.getElementById('narrativeSection').innerHTML = narrative;
+
+      // Show output section
+      document.getElementById('output').classList.remove('hidden');
+      document.getElementById('output').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Generate button click event
+    document.getElementById('generate').addEventListener('click', generate);
+    
+    // Render entries when page loads
+    renderEntries();
+  </script>
+</body>
+</html>
